@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="app_name">Glass_picture_capturer</string>
+	<string name="action_settings">Settings</string>
+    <string name="detect_camera">detect camera</string>
+    <string name="test_string">Hello</string>
+    <string name="stop">Stop</string>
+    
+</resources>
