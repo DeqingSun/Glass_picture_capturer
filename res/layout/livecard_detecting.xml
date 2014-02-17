@@ -2,13 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#001133">
+    android:background="#000000">
 
     <TextView android:id="@+id/livecard_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:keepScreenOn="true"
-        android:textColor="#88eafa"
+        android:textColor="#FFFFFF"
         android:textStyle="bold"
         android:textSize="50sp"
         android:gravity="center"

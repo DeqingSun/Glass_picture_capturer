@@ -22,14 +22,11 @@ import com.google.android.glass.timeline.TimelineManager;
 
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
 import android.widget.RemoteViews;
 
 /**
@@ -48,11 +45,18 @@ public class Camera_listener_service extends Service {
 
     Camera_event_Reciever camera_event_r;
     
+    int pic_count=0;
     
     @Override
     public void onCreate() {
         super.onCreate();
         mTimelineManager = TimelineManager.from(this);
+        
+     	IntentFilter intentFilter = new IntentFilter("android.intent.action.CAMERA_BUTTON");
+     	camera_event_r = new Camera_event_Reciever();
+        //---register the receiver---
+        registerReceiver(camera_event_r, intentFilter);  
+        
     }
 
     @Override
@@ -63,17 +67,20 @@ public class Camera_listener_service extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
     	Log.i ("info", "STARTED!!!");
-    	
-     	IntentFilter intentFilter = new IntentFilter("android.intent.action.CAMERA_BUTTON");
-     	camera_event_r = new Camera_event_Reciever();
-        //---register the receiver---
-        registerReceiver(camera_event_r, intentFilter);  
+
+    	String capture_result = intent.getStringExtra("picture");
+    	if (capture_result!=null && capture_result.equals("button")){
+    		Log.i ("info", "this is a pic");
+    		pic_count++;
+    	}
     	
         if (mLiveCard == null) {
             Log.i ("info", "Publishing LiveCard");
             mLiveCard = mTimelineManager.createLiveCard(LIVE_CARD_TAG);
 
-            mLiveCard.setViews(new RemoteViews(this.getPackageName(),R.layout.livecard_detecting));
+            RemoteViews rv=new RemoteViews(this.getPackageName(),R.layout.livecard_detecting);
+            rv.setTextViewText(R.id.livecard_content, "Ready to capture");
+            mLiveCard.setViews(rv);
 
             Intent menuIntent = new Intent(this, MenuActivity.class);
             menuIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -82,6 +89,11 @@ public class Camera_listener_service extends Service {
             mLiveCard.publish(PublishMode.REVEAL);
             Log.i ("info", "Done publishing LiveCard");
         } else {
+        	if (mLiveCard.isPublished()){
+        		RemoteViews rv=new RemoteViews(this.getPackageName(),R.layout.livecard_detecting);
+                rv.setTextViewText(R.id.livecard_content, "Captured "+ pic_count + " pics");
+                mLiveCard.setViews(rv);
+        	}
             //  Jump to the LiveCard when API is available.
         }
 
@@ -90,6 +102,7 @@ public class Camera_listener_service extends Service {
 
     @Override
     public void onDestroy() {
+    	Log.i ("info", "Destroy!!!");
         if (mLiveCard != null && mLiveCard.isPublished()) {
         	Log.i ("info", "Unpublishing LiveCard");
             mLiveCard.unpublish();
