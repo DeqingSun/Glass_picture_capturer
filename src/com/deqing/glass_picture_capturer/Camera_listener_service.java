@@ -21,7 +21,6 @@ import java.util.Iterator;
 
 import com.google.android.glass.timeline.LiveCard;
 import com.google.android.glass.timeline.LiveCard.PublishMode;
-import com.google.android.glass.timeline.TimelineManager;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -47,7 +46,7 @@ public class Camera_listener_service extends Service {
 
     private static final String LIVE_CARD_TAG = "Camera_listener";
 
-    private TimelineManager mTimelineManager;
+    //private TimelineManager mTimelineManager;
     private LiveCard mLiveCard;
 
     Handler handler = new Handler();
@@ -88,7 +87,7 @@ public class Camera_listener_service extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mTimelineManager = TimelineManager.from(this);
+        //mTimelineManager = TimelineManager.from(this);
         
      	IntentFilter intentFilter = new IntentFilter("android.intent.action.CAMERA_BUTTON");
      	camera_event_r = new Camera_event_Reciever();
@@ -122,7 +121,7 @@ public class Camera_listener_service extends Service {
     	
         if (mLiveCard == null) {
             Log.i ("info", "Publishing LiveCard");
-            mLiveCard = mTimelineManager.createLiveCard(LIVE_CARD_TAG);
+            mLiveCard = new LiveCard(this, LIVE_CARD_TAG);
 
             RemoteViews rv=new RemoteViews(this.getPackageName(),R.layout.livecard_detecting);
             rv.setTextViewText(R.id.livecard_content, "Ready to capture");
@@ -146,7 +145,7 @@ public class Camera_listener_service extends Service {
                 	if (mUsbManager.hasPermission (target_device)){
                     	Log.i ("info", "has permission");
                     	if (toggle_light){
-                    		cmd_flashlight('T');
+                    		cmd_flashlight('O');
                         	handler.removeCallbacksAndMessages(null);  
                         	handler.postDelayed(new Runnable(){
                                 @Override
